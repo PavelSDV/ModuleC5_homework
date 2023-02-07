@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .btn {
+            padding: 0;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: none;
+            cursor: pointer;
+
+            margin: 5px 10px;
+            padding: 10px 15px;
+            border-radius: 1px;
+            font-size: 12px;
+            line-height: 15px;
+            text-transform: uppercase;
+            color: white;
+            background: #315efb;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            box-shadow: 0px 2px 8px 2px rgba(141,150,178,.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<h1>Практика, задание 4</h1>
+
+<div>Напишите код приложение</div>
+<ol>
+    <li>интерфейс которого представляет собой 2 input и кнопку. В input можно ввести любое число.</li>
+    <li>При клике на кнопку происходит следующее:</li>
+    <li>Если оба числа не попадают в диапазон от 100 до 300 или введено не число — выводить ниже текст «одно из чисел вне диапазона от 100 до 300»;</li>
+    <li>Если числа попадают в диапазон от 100 до 300 — сделать запрос c помощью fetch по URL https://picsum.photos/200/300, где первое число — ширина картинки, второе — высота.</li>
+    <li>После получения данных вывести ниже картинку на экран.</li>
+</ol>
+
+<input type="text" id="inputHoriz">
+<input type="text" id="inputVert">
+<button class="btn j-btn">Запрос за данными</button>
+<div id="resultText"></div>
+<div id="photoGet"></div>
+
+<script>
+
+    const btnNode = document.querySelector('.j-btn');
+    const resultText = document.getElementById("resultText");
+    const photoGet = document.getElementById("photoGet");
+
+    btnNode.addEventListener('click', () => {
+        const inputHoriz = document.getElementById("inputHoriz").value;
+        const inputVert = document.getElementById("inputVert").value;
+
+        if (isNaN(inputHoriz) ||  isNaN(inputVert) || inputHoriz < 100 || inputHoriz > 300 || inputVert < 100 || inputVert > 300) {
+            resultText.textContent = "Одно из чисел вне диапазона от 100 до 300";
+            photoGet.innerHTML = "";
+            return
+        }
+
+        fetch(`https://picsum.photos/${inputHoriz}/${inputVert}`)
+            .then((response) => {
+                console.log('response', response);
+                let imgSet = response.url;
+                resultText.innerHTML = `Загружено фото размером ${inputHoriz}x${inputVert}`;
+                photoGet.innerHTML = `<img src=${imgSet}>`;
+            })
+
+            .catch(() => {
+                console.log('error')
+                photoGet.innerHTML = ""; // если ошибка чтобы предыдущее фото убирал, если оно было
+                resultText.innerHTML = "Ошибка загрузки фото";
+            });
+    });
+</script>
+</body>
+</html>

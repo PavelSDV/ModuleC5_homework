@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .result {
+            display: flex;
+            flex-wrap: wrap;
+            width: 500px;
+        }
+
+        .card {
+            width: 200px;
+            margin: 20px;
+        }
+
+        .card-image {
+            display: block;
+            width: 200px;
+            height: 150px;
+        }
+
+        .btn {
+            padding: 0;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: none;
+            cursor: pointer;
+
+            margin: 5px 10px;
+            padding: 10px 15px;
+            border-radius: 1px;
+            font-size: 12px;
+            line-height: 15px;
+            text-transform: uppercase;
+            color: white;
+            background: #315efb;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            box-shadow: 0px 2px 8px 2px rgba(141,150,178,.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+<h1>Практика, задание 3</h1>
+
+<div>Напишите код приложение</div>
+<ol>
+    <li>Интерфейс которого представляет собой input и кнопку.</li>
+    <li>При клике на кнопку должно происходить следующее:</li>
+    <li>Если число не попадает в диапазон от 1 до 10 — выводить ниже текст «число вне диапазона от 1 до 10».</li>
+    <li>Если число попадает в диапазон от 1 до 10 — сделать запрос c помощью XHR по URL https://picsum.photos/v2/list?limit=10, где get-параметр limit — это введённое число.</li>
+</ol>
+
+<input type="text" name="input" >
+
+<button class="btn j-btn-request">Запрашиваем данные</button>
+
+<div id="inputValid"></div>
+
+<div class="result j-result"></div>
+
+<script>
+    function useRequest(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+
+        xhr.onload = function() {
+            if (xhr.status != 200) {
+                console.log('Статус ответа: ', xhr.status);
+            } else {
+                const result = JSON.parse(xhr.response);
+                if (callback) {
+                    callback(result);
+                }
+            }
+        };
+
+        xhr.onerror = function() {
+            console.log('Ошибка! Статус ответа: ', xhr.status);
+        };
+
+        xhr.send();
+    };
+
+    const resultNode = document.querySelector('.j-result');
+    const btnNode = document.querySelector('.j-btn-request');
+    const inputValidNode = document.getElementById("inputValid");
+
+    function displayResult(apiData) {
+        let cards = '';
+
+        apiData.forEach(item => {
+            const cardBlock = `
+                     <div class="card">
+                        <img src="${item.download_url}" class="card-image" />
+                        <p>${item.author}</p>
+                     </div>`;
+
+            cards = cards + cardBlock;
+        });
+
+        resultNode.innerHTML = cards;
+    }
+
+    btnNode.addEventListener('click', () => {
+
+        const imputNum = document.querySelector('input').value;
+
+        if (isNaN(imputNum) ) {
+            inputValidNode.textContent = "Введено не число";
+            resultNode.innerHTML = "";
+            return;
+        } else if  (imputNum < 1 || imputNum > 10) {
+            inputValidNode.textContent = "Число вне диапазона от 1 до 10";
+            resultNode.innerHTML = "";
+            return;
+        }
+        else {  // чтобы убирал текст, если в начале введено не правильное число и фото на всякий случай
+            inputValidNode.textContent = "";
+            resultNode.innerHTML = "";
+        }
+
+        useRequest(`https://picsum.photos/v2/list/?limit=${imputNum}`, displayResult);
+
+    })
+</script>
+</body>
+</html>
